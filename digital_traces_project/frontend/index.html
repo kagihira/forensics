@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Цифровая криминалистика</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <h1>Система поиска цифровых следов</h1>
+
+    <div class="container">
+        <div class="card">
+            <h2>📂 Загрузка .E01</h2>
+            <form id="uploadForm">
+                <input type="file" id="e01File" accept=".E01" title="Выберите файл .E01" required>
+                <input type="text" id="deviceId" placeholder="ID устройства" required>
+                <button type="submit">Загрузить</button>
+            </form>
+            <p id="uploadResult"></p>
+        </div>
+
+        <div class="card">
+            <h2>📜 Извлечение текста</h2>
+            <input type="text" id="extractDeviceId" placeholder="ID устройства" required>
+            <button onclick="extractText()">Извлечь текст</button>
+            <p id="extractResult"></p>
+        </div>
+
+        <div class="card">
+            <h2>🔍 Анализ текста</h2>
+            <input type="text" id="analyzeDeviceId" placeholder="ID устройства" required>
+            <button onclick="analyzeText()">Анализировать</button>
+            <p id="analyzeResult"></p>
+        </div>
+
+        <div class="card">
+            <h2>⚖️ Сравнение устройств</h2>
+            <input type="text" id="compareDevice1" placeholder="ID устройства 1" required>
+            <input type="text" id="compareDevice2" placeholder="ID устройства 2" required>
+            <button onclick="compareDevices()">Сравнить</button>
+            <div id="compareResult"></div>
+        </div>
+
+        <div class="card">
+            <h2>📩 Анализ переписки</h2>
+            <input type="text" id="messagesDeviceId" placeholder="ID устройства" required>
+            <button onclick="analyzeMessages()">Анализировать переписку</button>
+            <div id="messagesResult"></div>
+        </div>
+
+        <div class="card">
+            <h2>⚠️ Сортировка документов</h2>
+            <input type="text" id="sortDeviceId" placeholder="ID устройства" required>
+            <button onclick="sortDocuments()">Сортировать</button>
+            <div id="sortResult"></div>
+        </div>
+
+        <div class="card">
+            <h2>🔗 Поиск связей</h2>
+            <input type="text" id="connectionsDeviceId" placeholder="ID устройства" required>
+            <button onclick="findConnections()">Найти связи</button>
+            <div id="connectionsResult"></div>
+        </div>
+
+    </div>
+
+
+
+
+    <script src="script.js"></script>
+</body>
+</html>

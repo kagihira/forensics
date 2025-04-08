@@ -1,4 +1,16 @@
 from fastapi import FastAPI, UploadFile, File, Form
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI()
+
+# Разрешаем доступ с фронтенда (порт 5500, 8001 или любой другой)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Можно указать конкретный адрес фронтенда
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 import shutil
 import os
 import uuid
@@ -7,13 +19,24 @@ from backend.extract_from_e01 import extract_files_from_e01
 from backend.extract_text import extract_text_from_file
 from backend.analyze_text import classify_text
 from backend.compare_devices import compare_texts, compare_images, get_all_files
+from backend.messages_analysis import analyze_conversations
+from backend.document_sorting import sort_documents_by_risk
+from backend.user_connections import find_user_connections
+
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 UPLOAD_DIR = "uploads"
 EXTRACTED_DIR = "data"
 
-# 📂 Создаём папки, если их нет
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 os.makedirs(EXTRACTED_DIR, exist_ok=True)
 
@@ -31,7 +54,6 @@ async def upload_e01(file: UploadFile = File(...), device_id: str = Form(...)):
     with open(file_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
 
-    # Извлекаем файлы в папку устройства
     extraction_success = extract_files_from_e01(file_path, device_folder)
 
     if not extraction_success:
@@ -50,11 +72,10 @@ async def extract_text_from_device(device_id: str):
 
     extracted_data = {}
 
-    for file_path in get_all_files(device_id):  # Теперь ищем во всех папках
+    for file_path in get_all_files(device_id):
         extracted_text = extract_text_from_file(file_path)
         extracted_data[file_path] = extracted_text
 
-    # Сохраняем извлеченные данные в JSON
     extracted_text_file = os.path.join(device_folder, "extracted_text.json")
     with open(extracted_text_file, "w", encoding="utf-8") as f:
         json.dump(extracted_data, f, indent=4)
@@ -80,7 +101,6 @@ async def analyze_text_for_device(device_id: str):
         classification = classify_text(text)
         analyzed_results[filename] = classification
 
-    # Сохраняем анализ
     with open(f"{device_folder}/analysis_results.json", "w", encoding="utf-8") as f:
         json.dump(analyzed_results, f, indent=4)
 
@@ -101,3 +121,53 @@ async def compare_device_images(device1: str, device2: str):
     """
     matches = compare_images(device1, device2)
     return {"image_matches": matches}
+
+
+@app.get("/analyze_messages/{device_id}/")
+async def analyze_messages(device_id: str):
+    """
+    Анализирует переписку между номерами телефона на устройстве.
+    """
+    result = analyze_conversations(device_id)
+    return result
+
+@app.get("/sort_documents/{device_id}/")
+async def sort_documents(device_id: str):
+    """
+    Сортирует документы на "Опасные" и "Безопасные".
+    """
+    result = sort_documents_by_risk(device_id)
+    return result
+
+@app.get("/find_connections/{device_id}/")
+async def find_connections(device_id: str):
+    """
+    Поиск связей между пользователями на основе переписки и контактов.
+    """
+    result = find_user_connections(device_id)
+    return result
+
+
+@app.get("/analyze_messages/{device_id}/")
+async def analyze_messages(device_id: str):
+    """
+    Анализирует переписку между номерами телефона на устройстве.
+    """
+    result = analyze_conversations(device_id)
+    return result
+
+@app.get("/sort_documents/{device_id}/")
+async def sort_documents(device_id: str):
+    """
+    Сортирует документы на "Опасные" и "Безопасные".
+    """
+    result = sort_documents_by_risk(device_id)
+    return result
+
+@app.get("/find_connections/{device_id}/")
+async def find_connections(device_id: str):
+    """
+    Поиск связей между пользователями на основе переписки и контактов.
+    """
+    result = find_user_connections(device_id)
+    return result
